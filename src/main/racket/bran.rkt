@@ -4,6 +4,8 @@
 
 (define-ffi-definer define-wiringpi (ffi-lib "libwiringPi"))
 
+(define-wiringpi wiringPiSetup (_fun -> _int))
+(define-wiringpi wiringPiSetupSys (_fun -> _int))
 (define-wiringpi pinMode (_fun _int _int -> _void))
 (define-wiringpi digitalWrite (_fun _int _int -> _void))
 (define-wiringpi pwmWrite (_fun _int _int -> _void))
