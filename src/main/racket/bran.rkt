@@ -1,22 +1,46 @@
-#lang racket/base
+#lang racket
 (require ffi/unsafe
          ffi/unsafe/define)
+(require (prefix-in wp. "wiringPi.rkt"))
 
-(define-ffi-definer define-wiringpi (ffi-lib "libwiringPi"))
+;; Pin modes
+(struct pin-mode (value))
 
-(define-wiringpi wiringPiSetup (_fun -> _int))
-(define-wiringpi wiringPiSetupSys (_fun -> _int))
-(define-wiringpi pinMode (_fun _int _int -> _void))
-(define-wiringpi digitalWrite (_fun _int _int -> _void))
-(define-wiringpi pwmWrite (_fun _int _int -> _void))
-(define-wiringpi digitalRead (_fun _int -> _int))
-(define-wiringpi wiringPiSPISetup (_fun _int _int -> _int))
-(define-wiringpi wiringPiSPIDataRW (_fun _int _pointer _int -> _int))
+(define INPUT            (pin-mode 0))
+(define OUTPUT           (pin-mode 1))
+(define PWM_OUTPUT       (pin-mode 2))
+(define GPIO_CLOCK       (pin-mode 3))
+(define SOFT_PWM_OUTPUT  (pin-mode 4))
+(define SOFT_TONE_OUTPUT (pin-mode 5))
+(define PWM_TONE_OUTPUT  (pin-mode 6))
+
+;; Basic functions
+(define (setup)
+  (wp.wiringPiSetup))
+
+(define (pinMode pin mode)
+  (wp.pinMode pin (pin-mode-value mode)))
+
+(define (digitalWrite pin value)
+  (wp.digitalWrite pin value))
+
+(define (digitalRead pin)
+  (wp.digitalRead pin))
+
+; pin:   1
+; value: 0 - 1024
+(define (pwmWrite pin value)
+  (wp.pwmWrite pin value))
+
+; channel: 0, 1
+; speed: 500000 - 32000000
+(define (spiSetup channel speed)
+  (wp.wiringPiSPISetup channel speed))
 
 (define (spi channel type data)
   (let ([buf (malloc 'atomic type)])
     (ptr-set! buf type data)
-    (wiringPiSPIDataRW channel buf (ctype-sizeof type))
+    (wp.wiringPiSPIDataRW channel buf (ctype-sizeof type))
     (ptr-ref buf type)))
 
 (define (spiByte channel data)
@@ -24,5 +48,23 @@
 
 (define (spiInt channel data)
   (spi channel _int data))
+
+;; AD5206 Digital Pot
+(struct ad5206 (cs channel sdi))
+
+(define (ad5206Setup pot)
+  (match pot
+    [(ad5206 cs channel sdi) (pinMode cs OUTPUT)]))
+
+; pot: ad5206?
+; address: 0 - 5
+; value: 0 - 255
+(define (ad5206Write pot address value)
+  (match pot
+    [(ad5206 cs channel sdi)
+     (digitalWrite cs 0)
+     (spiInt channel address)
+     (spiInt channel value)
+     (digitalWrite cs 1)]))
 
 (provide (all-defined-out))

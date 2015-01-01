@@ -1,9 +1,13 @@
 #lang racket/base
 (require "bran.rkt")
 
-(wiringPiSetup)
-(pinMode 1 1)
+(setup)
+(pinMode 1 OUTPUT)
 (digitalWrite 1 1)
+
+;; spi
+(spiSetup 0 500000)
+
 
 ;; (wiringPiSetupSys)
 ;; (spiByte 1 2)
