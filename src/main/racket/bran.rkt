@@ -50,18 +50,18 @@
   (spi channel _int data))
 
 ;; AD5206 Digital Pot
-(struct ad5206 (channel cs sdi))
+(struct ad5206 (channel cs))
 
 (define (ad5206Setup pot)
   (match pot
-    [(ad5206 channel cs sdi) (pinMode cs OUTPUT)]))
+    [(ad5206 channel cs) (pinMode cs OUTPUT)]))
 
 ; pot: ad5206?
 ; address: 0 - 5
 ; value: 0 - 255
 (define (ad5206Write pot address value)
   (match pot
-    [(ad5206 channel cs sdi)
+    [(ad5206 channel cs)
      (digitalWrite cs 0)
      (spiByte channel address)
      (spiByte channel value)
