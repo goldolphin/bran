@@ -15,7 +15,7 @@
 (define PWM_TONE_OUTPUT  (pin-mode 6))
 
 ;; Basic functions
-(define (setup)
+(define (gpioSetup)
   (wp.wiringPiSetup))
 
 (define (pinMode pin mode)
@@ -55,6 +55,11 @@
 (define (ad5206Setup pot)
   (match pot
     [(ad5206 channel cs) (pinMode cs OUTPUT)]))
+
+(define (ad5206Create channel cs)
+  (let ([pot (ad5206 channel cs)])
+    (ad5206Setup pot)
+    pot))
 
 ; pot: ad5206?
 ; address: 0 - 5
