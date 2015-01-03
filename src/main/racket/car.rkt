@@ -39,21 +39,18 @@
 ;; Create a car
 (define car (Car (ad5206Create 0 1) 0 1))
 
-;; Run
+;; Run a 8-pattern path.
 (reset car)
 (sleep 2)
 
-(throttle car 50)
-(steer car 50)
+(throttle car -99)
+(steer car 99)
 (sleep 5)
 
-(steer car -50)
+(steer car -99)
 (sleep 5)
-
-(steer car 0)
-(sleep 5)
-
-(throttle car 0)
-(sleep 2)
 
 (reset car)
+
+;;;
+(provide (all-defined-out))
